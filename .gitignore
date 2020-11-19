@@ -1,3 +1,10 @@
+models/
+data/
+.idea/
+.ipynb_checkpoints/
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
