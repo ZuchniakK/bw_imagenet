@@ -58,12 +58,12 @@ def train(model_name, batch_size):
         os.makedirs(model_dir)
 
     backup = tf.keras.callbacks.experimental.BackupAndRestore(join(model_dir, 'backup'))
-    lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00005)
-    early_stoping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)
+    lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=10, min_lr=0.00005)
+    early_stoping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=30, restore_best_weights=True)
     csv_logger = tf.keras.callbacks.CSVLogger(join(model_dir, 'train_log.csv'), append=True)
 
     model.compile(loss='categorical_crossentropy',
-                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
                   metrics=['accuracy'])
 
     model.fit(
