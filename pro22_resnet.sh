@@ -1,6 +1,6 @@
 #!/bin/bash -l
 ## Nazwa zlecenia
-#SBATCH -J resnetbw50
+#SBATCH -J resnetbw50tf22
 ## Liczba alokowanych węzłów
 #SBATCH -N 1
 ## Liczba zadań per węzeł (domyślnie jest to liczba alokowanych rdzeni na węźle)
@@ -15,9 +15,9 @@
 #SBATCH --partition=plgrid-gpu-v100
 #SBATCH --gres=gpu:2
 ## Plik ze standardowym wyjściem
-#SBATCH --output="resnetbw50.out"
+#SBATCH --output="resnetbw50tf22.out"
 ## Plik ze standardowym wyjściem błędów
-#SBATCH --error="resnetbw50.err"
+#SBATCH --error="resnetbw50tf22.err"
 
 
 ## przejscie do katalogu z ktorego wywolany zostal sbatch
