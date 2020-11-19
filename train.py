@@ -7,14 +7,15 @@ import sys
 import json
 
 from datasets_generator import BWImageNetDataGenerator
+from custom_calbacks import BackupAndRestore
 
-DATA_DIRECTORY = '/net/scratch/datasets/AI/imagenet/data'
-# DATA_DIRECTORY = 'data'
+# DATA_DIRECTORY = '/net/scratch/datasets/AI/imagenet/data'
+DATA_DIRECTORY = 'data'
 MODEL_DIRECTORY = 'models'
 MAX_TRAIN_EPOCH = 1000
-EPOCH_PER_DATASET = 1
+EPOCH_PER_DATASET = 0.2
 VALIDATION_SPLIT = 0.2
-TRAIN_N_SAMPLES = 50000
+TRAIN_VAL_N_SAMPLES = 1281167
 TEST_N_SAMPLES = 50000
 
 
@@ -57,7 +58,8 @@ def train(model_name, batch_size):
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
 
-    backup = tf.keras.callbacks.experimental.BackupAndRestore(join(model_dir, 'backup'))
+    # backup = tf.keras.callbacks.experimental.BackupAndRestore(join(model_dir, 'backup'))
+    backup = BackupAndRestore(join(model_dir, 'backup'))
     lr_reducer = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=10, min_lr=0.00005)
     early_stoping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=30, restore_best_weights=True)
     csv_logger = tf.keras.callbacks.CSVLogger(join(model_dir, 'train_log.csv'), append=True)
@@ -71,12 +73,12 @@ def train(model_name, batch_size):
         epochs=MAX_TRAIN_EPOCH,
         callbacks=[backup, lr_reducer, early_stoping, csv_logger],
         validation_data=bw_gen.val_flow(),
-        steps_per_epoch=int((TRAIN_N_SAMPLES * (1 - VALIDATION_SPLIT)) / batch_size * EPOCH_PER_DATASET),
-        validation_steps=int((TRAIN_N_SAMPLES * VALIDATION_SPLIT) / batch_size * EPOCH_PER_DATASET))
+        steps_per_epoch=int((TRAIN_VAL_N_SAMPLES * (1 - VALIDATION_SPLIT)) / batch_size * EPOCH_PER_DATASET),
+        validation_steps=int((TRAIN_VAL_N_SAMPLES * VALIDATION_SPLIT) / batch_size * EPOCH_PER_DATASET))
 
     result = model.evaluate(
         x=bw_gen.test_flow(),
-        steps=int(batch_size(TRAIN_N_SAMPLES * VALIDATION_SPLIT)),
+        steps=int(batch_size(TRAIN_VAL_N_SAMPLES * VALIDATION_SPLIT)),
         return_dict=True)
 
     with open(join(model_dir, 'evaluation.txt'), 'w') as file:

@@ -310,10 +310,11 @@ def str2bool(v):
 
 class BWImageNetDataGenerator:
     def __init__(self, directory, batch_size=32, target_size=(224, 224), validation_split=0.2, auto_augment=True,
-                 cutout=True):
-        train_val_datagen = ImageDataGenerator(horizontal_flip=True, validation_split=validation_split)
-        test_datagen = ImageDataGenerator()
+                 cutout=True, decolorize=True):
+        train_val_datagen = ImageDataGenerator(horizontal_flip=True, validation_split=validation_split, rescale=1/255)
+        test_datagen = ImageDataGenerator(rescale=1/255)
 
+        self.batch_size = batch_size
         self.train_iterator = train_val_datagen.flow_from_directory(directory=join(directory, 'train'),
                                                                     target_size=target_size,
                                                                     batch_size=batch_size,
@@ -334,12 +335,13 @@ class BWImageNetDataGenerator:
 
         self.auto_augment = auto_augment
         self.cutout = cutout
+        self.decolorize = decolorize
 
         if auto_augment:
             self.policies = IMAGENET_POLICIES
 
     def _standardize(self, x):
-        x = x.astype('float32') / 255
+        # x = x.astype('float32') / 255
 
         means = self.means.reshape(1, 1, 1, 3)
         stds = self.stds.reshape(1, 1, 1, 3)
@@ -356,11 +358,15 @@ class BWImageNetDataGenerator:
         x = (x * channel_weights).sum(axis=3).reshape((x.shape[0], x.shape[1], x.shape[2], 1))
         return x
 
+        # return (x.sum(axis=3)/3).reshape((x.shape[0], x.shape[1], x.shape[2], 1))
+
 
 
     def _flow(self, iterator, train=True):
 
         while True:
+
+            # yield next(iterator)
             x_batch, y_batch = next(iterator)
 
 
@@ -374,9 +380,14 @@ class BWImageNetDataGenerator:
                     x_batch[i] = apply_policy(x_batch[i], self.policies[random.randrange(len(self.policies))])
 
             x_batch = self._standardize(x_batch)
-            x_batch = self._decolorize(x_batch)
+            if self.decolorize:
+                x_batch = self._decolorize(x_batch)
 
             yield x_batch, y_batch
+
+
+            # for i in range(10):
+            #     yield x_batch[i*self.batch_size:(i+1)*self.batch_size], y_batch[i*self.batch_size:(i+1)*self.batch_size]
 
     def train_flow(self):
         return self._flow(self.train_iterator, train=False)
