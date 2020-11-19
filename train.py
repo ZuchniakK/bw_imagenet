@@ -9,9 +9,10 @@ import json
 from datasets_generator import BWImageNetDataGenerator
 
 DATA_DIRECTORY = '/net/scratch/datasets/AI/imagenet/data'
+# DATA_DIRECTORY = 'data'
 MODEL_DIRECTORY = 'models'
 MAX_TRAIN_EPOCH = 1000
-EPOCH_PER_DATASET = 0.005
+EPOCH_PER_DATASET = 1
 VALIDATION_SPLIT = 0.2
 TRAIN_N_SAMPLES = 50000
 TEST_N_SAMPLES = 50000
