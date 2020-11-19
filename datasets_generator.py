@@ -9,7 +9,8 @@ import random
 import numpy as np
 import scipy
 from scipy import ndimage
-from PIL import Image, ImageEnhance, ImageOps
+from PIL import Image, ImageEnhance, ImageOps, ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 import random
 # from keras.preprocessing.image import ImageDataGenerator
@@ -357,16 +358,17 @@ class BWImageNetDataGenerator:
 
 
 
-    def _flow(self, iterator):
+    def _flow(self, iterator, train=True):
 
         while True:
             x_batch, y_batch = next(iterator)
 
-            if self.cutout:
+
+            if train and self.cutout:
                 for i in range(x_batch.shape[0]):
                     x_batch[i] = cutout(x_batch[i])
 
-            if self.auto_augment:
+            if train and self.auto_augment:
                 x_batch = x_batch.astype('uint8')
                 for i in range(x_batch.shape[0]):
                     x_batch[i] = apply_policy(x_batch[i], self.policies[random.randrange(len(self.policies))])
@@ -377,13 +379,13 @@ class BWImageNetDataGenerator:
             yield x_batch, y_batch
 
     def train_flow(self):
-        return self._flow(self.train_iterator)
+        return self._flow(self.train_iterator, train=False)
 
     def val_flow(self):
-        return self._flow(self.validation_iterator)
+        return self._flow(self.validation_iterator, train=False)
 
     def test_flow(self):
-        return self._flow(self.test_iterator)
+        return self._flow(self.test_iterator, train=False)
 
 
 

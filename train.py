@@ -63,7 +63,7 @@ def train(model_name, batch_size):
     csv_logger = tf.keras.callbacks.CSVLogger(join(model_dir, 'train_log.csv'), append=True)
 
     model.compile(loss='categorical_crossentropy',
-                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.005),
                   metrics=['accuracy'])
 
     model.fit(
