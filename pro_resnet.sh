@@ -30,4 +30,4 @@ module load plgrid/libs/tensorflow-gpu/2.3.1-python-3.8
 export LD_LIBRARY_PATH=/net/people/plgurvanish/cuda/lib64:$LD_LIBRARY_PATH
 export PYTHONPATH=/net/scratch/people/plgurvanish/bw_imagenet:$PYTHONPATH
 
-python3 train.py ResNet50 1024
+python3 train.py ResNet50 128
